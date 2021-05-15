@@ -86,10 +86,10 @@ void setup()
 
 void loop() {
 
-  // if (!client.connected()) {
-  //  reconnect();
-  // }
-  // client.loop();
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
 
   long now = millis();
   if (now - lastMsg > wait) {  // delay 5000 
@@ -128,6 +128,6 @@ void loop() {
       irsend.sendRaw(air_cold,sizeof(air_cold)/sizeof(air_cold[0]),38);
       delay(5000);
     }
-    // client.publish(topic, msg);  /// publish the msg
+  client.publish(topic, msg);  /// publish the msg
   }
 }
