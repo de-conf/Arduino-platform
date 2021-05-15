@@ -78,9 +78,9 @@ void setup()
   Serial.begin(9600);
   Ethernet.begin(mac, ip);
   dht.begin();
-  //client.setServer(mqtt_server, 1883);
-  // client.setCallback(callback);
-  // Allow the hardware to sort itself out
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+  //Allow the hardware to sort itself out
   delay(1500);
 }
 
