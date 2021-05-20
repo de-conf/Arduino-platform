@@ -12,8 +12,10 @@
 
 
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-IPAddress ip(192,168,0,198);  // <- change to match your network
-
+IPAddress ip(10,10,6,210);  // <- change to match your network
+IPAddress gateway(10, 10, 6, 253);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress myDns(10,200,4,1);
 #define DHTPIN 7
 // DHT11 sensor type
 #define DHTTYPE DHT11
@@ -24,7 +26,7 @@ IPAddress ip(192,168,0,198);  // <- change to match your network
 
 
 // your mqtt_server broker and topic to connect to  
-const char* mqtt_server = "192.168.0.197";    // use ifconfig on Linux 
+const char* mqtt_server = "10.200.21.101";    // use ifconfig on Linux 
 const char* topic = "test"; 
 
 // create objects, instances
@@ -76,7 +78,7 @@ void reconnect() {
 void setup()
 {
   Serial.begin(9600);
-  Ethernet.begin(mac, ip);
+  Ethernet.begin(mac, ip, myDns , gateway, subnet);
   dht.begin();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -118,13 +120,13 @@ void loop() {
     snprintf (msg, 50, "%d %s %s %d", card_id, t_str.c_str(), h_str.c_str(), gaz);  // to sytle the message to send exmp : "1 23.00 54"
     Serial.print("Publish message: ");
     Serial.println(msg);
-    if (h < 28.0){
+    if (t < 20.0){
       Serial.print("The air conditioning is check auto");
       irsend.sendRaw(air_auto,sizeof(air_auto)/sizeof(air_auto[0]),38);  // (data,length.khz(38))
       delay(5000);
     }
-    if(h > 35.0){
-      Serial.print("The air conditioning is check auto");
+    if(t > 35.0){
+      Serial.print("The air conditioning is check clod");
       irsend.sendRaw(air_cold,sizeof(air_cold)/sizeof(air_cold[0]),38);
       delay(5000);
     }
