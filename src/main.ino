@@ -10,12 +10,24 @@
 //Raw (74): -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 -32150 32150 
 // Automatic status of my air conditioner
 
+/*
+note：
+As of Arduino IDE 1.0, serial transmission is asynchronous. 
+If there is enough empty space in the transmit buffer, Serial.write() will return before any characters are transmitted over serial. 
+If the transmit buffer is full then Serial.write() will block until there is enough space in the buffer. 
+To avoid blocking calls to Serial.write(), you can first check the amount of free space in the transmit buffer using availableForWrite().
+
+example:
+#define serialPrintCheck(x) if(serial.availableForWrite()) serial.print(x);
+
+*/
+
 
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-IPAddress ip(10,10,6,210);  // <- change to match your network
-IPAddress gateway(10, 10, 6, 253);
+IPAddress ip(192,168,0,190);  // <- change to match your network
+IPAddress gateway(192,168,0,1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress myDns(10,200,4,1);
+IPAddress myDns(192,168,0,1);
 #define DHTPIN 7
 // DHT11 sensor type
 #define DHTTYPE DHT11
@@ -45,31 +57,31 @@ const uint16_t air_auto[] = {32150,32150,32150,32150,32150,32150,32150,32150,321
 
 // used to see the published messaged has arrived 
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
-  Serial.println("------------------------------------------------------------");
-  Serial.println(); 
+  // Serial.print("Message arrived [");
+  // Serial.print(topic);
+  // Serial.print("] ");
+  // for (int i = 0; i < length; i++) {
+  //   Serial.print((char)payload[i]);
+  // }
+  // Serial.println();
+  // Serial.println("------------------------------------------------------------");
+  // Serial.println(); 
 }
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    // Serial.print("Attempting MQTT connection...");
     // Attempt to connect
     if (client.connect("arduinoClient")) {
-      Serial.println("connected");
+      // Serial.println("connected");
       // Once connected, publish an announcement...
       client.publish("outTopic","hello world");
       // ... and resubscribe
       client.subscribe("inTopic");
     } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      // Serial.print("failed, rc=");
+      // Serial.print(client.state());
+      // Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -106,27 +118,27 @@ void loop() {
     gaz=analogRead(0);
     // Check if any reads failed and exit early (to try again).
     if (isnan(h) || isnan(t) ) {
-    Serial.println("Failed to read from DHT sensor!");
+    // Serial.println("Failed to read from DHT sensor!");
     return;
     }
   
     // Display data
-    Serial.print("Humidity: ");
-    Serial.print(h);
-    Serial.print(" %\t");
-    Serial.print("Temperature: ");
-    Serial.print(t);
-    Serial.println(" *C "); 
+    // Serial.print("Humidity: ");
+    // Serial.print(h);
+    // Serial.print(" %\t");
+    // Serial.print("Temperature: ");
+    // Serial.print(t);
+    // Serial.println(" *C "); 
     snprintf (msg, 50, "%d %s %s %d", card_id, t_str.c_str(), h_str.c_str(), gaz);  // to sytle the message to send exmp : "1 23.00 54"
-    Serial.print("Publish message: ");
-    Serial.println(msg);
+    // Serial.print("Publish message: ");
+    // Serial.println(msg);
     if (t < 20.0){
-      Serial.print("The air conditioning is check auto");
+      // Serial.print("The air conditioning is check auto");
       irsend.sendRaw(air_auto,sizeof(air_auto)/sizeof(air_auto[0]),38);  // (data,length.khz(38))
       delay(5000);
     }
     if(t > 35.0){
-      Serial.print("The air conditioning is check clod");
+      // Serial.print("The air conditioning is check clod");
       irsend.sendRaw(air_cold,sizeof(air_cold)/sizeof(air_cold[0]),38);
       delay(5000);
     }
